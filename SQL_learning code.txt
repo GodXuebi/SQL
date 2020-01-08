@@ -1,0 +1,476 @@
+#创建employee表
+CREATE TABLE employee(
+	id int,
+	name varchar(20),
+	gender char(1),
+	birthday date,
+	entry_date date,
+	job varchar(50),
+	salary double,
+	resume text
+);
+
+#employee表增加主键，保证实体完整性
+CREATE TABLE employee(
+	id int primary key,
+	name varchar(20),
+	gender char(1),
+	birthday date,
+	entry_date date,
+	job varchar(50),
+	salary double,
+	resume text
+);
+
+CREATE TABLE employee(
+	id int,
+	name varchar(20),
+	gender char(1),
+	birthday date,
+	entry_date date,
+	job varchar(50),
+	salary double,
+	resume text,
+	primary key (id)
+);
+
+#为某些属性列添加NOT NULL约束
+CREATE TABLE employee(
+	id int,
+	name varchar(20),
+	gender char(1) NOT NULL,
+	birthday date,
+	entry_date date,
+	job varchar(50),
+	salary double,
+	resume text,
+	primary key (id)
+);
+
+#为某些属性列添加唯一UNIQUE约束
+CREATE TABLE employee(
+	id int,
+	name varchar(20) UNIQUE,
+	gender char(1) NOT NULL,
+	birthday date,
+	entry_date date,
+	job varchar(50),
+	salary double,
+	resume text,
+	primary key (id)
+);
+
+#为某些属性列添加默认值
+CREATE TABLE employee(
+	id int,
+	name varchar(20) UNIQUE,
+	gender char(1) NOT NULL,
+	birthday date,
+	entry_date date,
+	job varchar(50) default 'intern',
+	salary double,
+	resume text,
+	primary key (id)
+);
+
+#为主键设置自动增长
+CREATE TABLE employee(
+	id int auto_increment,
+	name varchar(20) UNIQUE,
+	gender char(1) NOT NULL,
+	birthday date,
+	entry_date date,
+	job varchar(50) default 'intern',
+	salary double,
+	resume text,
+	primary key (id)
+);
+
+
+#创建索引
+CREATE TABLE t1(
+	id int,
+	name VARCHAR(20),
+	score FLOAT,
+	index (id)
+);
+
+#创建唯一索引
+CREATE TABLE t1(
+	id int not null,
+	name VARCHAR(20),
+	score FLOAT,
+	unique index unique_id(id asc)
+);
+
+#创建全文索引
+CREATE TABLE t1(
+	id int not null,
+	name VARCHAR(20),
+	score FLOAT,
+	fulltext index full_text_name(name asc)
+)ENGINE=MyISAM;
+
+#创建单列索引
+CREATE TABLE t4(
+	id int not null,
+	name VARCHAR(20),
+	score FLOAT,
+	index single_name(name(20))
+);
+
+#创建符合索引
+CREATE TABLE t5(
+	id int not null,
+	name VARCHAR(20),
+	score FLOAT,
+	index multi(id,name(20))
+);
+
+
+#创建全文索引
+CREATE TABLE t6(
+	id int not null,
+	name VARCHAR(20),
+	score FLOAT,
+	fulltext index full_text_name(name asc)
+)ENGINE=MyISAM;
+
+#创建空间索引
+CREATE TABLE t7(
+	id int not null,
+	space geometry not null,
+	spatial index sp(space)
+)ENGINE=MyISAM;
+
+#INSERT
+
+insert into employee (id,name,gender,birthday,entry_date,job,salary,resume) values(null,'关羽','m','1990-08-08','2000-01-01','财神爷',9999.0,'来钱快');
+insert into employee (id,name,gender,birthday,entry_date,job,salary,resume) values(null,'张飞','m','1990-09-09','2000-01-01','杀手',998.0,'真的很难打');
+
+
+create table exam
+(
+	id int primary key auto_increment,
+	name varchar(20) not null,
+	chinese double,
+	math double,
+	english double
+);
+
+insert into exam values(null,'关羽',85,76,70),(null,'张飞',70,75,70),(null,'赵云',90,65,95);
+
+select distinct english from exam;
+select name,math+english+chinese from exam;
+ select name as '姓名',english+math+chinese as 总成绩 from exam;
+ select * from exam where english+math+chinese>200;
+select * from exam where english  in (76,75);
+select * from exam where name like '%飞';
+
+
+#聚合函数
+ select count(*) from exam where english>20;
+ select sum(math+english+chinese)/3 from exam;
+select avg(math+english+chinese) from exam;
+select avg(math+english+chinese) 总分平均分 from exam;
+
+#排序查询
+select name,math from exam order by math;
+select name,math from exam order by math desc;
+select name,math from exam order by math asc;
+select name 姓名,math+english+chinese 总分 from exam order by 总分 asc;
+
+
+#分组group by+分组选择having，where语句可以进行过滤，它是分组前进行过滤的，
+#where语句不允许使用聚合函数，如果分组之后进行过滤必须使用having语句进行，having语句
+#是可以使用聚合函数的。
+create table orders
+(
+	id int primary key not null,
+   	product varchar(20),
+	price float
+);
+
+insert into orders values(null,'电视',900),(null,'橘子',9),(null,'洗衣粉',90),(null,'洗衣粉',90),(null,'洗衣机',100);
+select product,sum(price) from orders group by product;
+select product 商品,sum(price) 总价 from orders where price<100 group by product having 总价>=100;
+
+
+#外键
+create table sept(
+	id int primary key auto_increment,
+	name varchar(40)
+);
+
+create table emp
+(
+	id int primary key auto_increment,
+	name varchar(40),
+	dept_id int,
+	foreign key (id) references spet(id)
+	
+);
+
+insert into emp values(null,'奥巴马',1),(null,'萨达姆',2),(null,'哈利波特',3),(null,'火车王',4),(null,'张三丰','6');
+insert into sept values(null,'财务部'),(null,'人事部'),(null,'科技部'),(null,'行政部'),(null,'销售部');
+
+alter table emp drop foreign key emp_ibfk_1;
+alter table emp add foreign key emp(id) references sept(id);
+
+#笛卡尔积
+select * from sept,emp;
+
+#内连接查询 查询出左边有而且右边表也有的元素
+select * from sept,emp where sept.id=emp.id;
+#左连接查询 在内连接的基础上添加左边表有而右边表没有的记录
+select * from sept left join emp on sept.id=emp.dept_id;
+#右连接查询 在内连接的基础上添加右边表有而左边表没有的记录
+select * from sept right join emp on sept.id=emp.dept_id;
+#全外连接
+select * from sept right join emp on sept.id=emp.dept_id
+union
+select * from sept left join emp on sept.id=emp.dept_id;
+
+ select emp.name 部门名称,sept.name 员工名称 from sept inner join emp on sept.id=emp.dept_id where sept.id=4;
+
+#带exists关键字的子查询
+select * from emp where exists (select * from emp where emp.id>1);
+#带any关键字的子查询
+ select sept.name as 部门名称 from sept where sept.id>any(select dept_id from emp);
+#带比较关键字的子查询
+select name from sept where id=(select dept_id from emp where name='奥巴马')；
+
+create table account(
+ 	id int primary key auto_increment,
+	name varchar(20),
+	money double
+);
+
+insert into account values (null,'a',1000.0),(null,'b',1000.0);
+
+
+
+#事务控制--提交
+start transaction;
+update account set money=money+100 where name='a';
+update account set money=money-100 where name='b';
+commit;
+
+#事务控制--回滚
+start transaction;
+update account set money=money+100 where name='a';
+update account set money=money-100 where name='b';
+rollback;
+
+#查看隔离性
+select @@tx_isolation;
+
+#设置隔离性
+set transaction isolation level repeatable read;
+
+
+#创建存储过程
+delimiter //
+create procedure Pro()
+begin
+	select * from account;
+end//
+
+#调用存储过程
+call Pro()//
+delimiter ;
+
+#在存储过程中定义变量
+delimiter //
+create procedure Pro2()
+begin
+	declare myvariable int default 100;
+	select myvariable;
+end//
+
+delimiter ;
+
+
+#在存储过程中修改变量
+delimiter //
+create procedure Pro3()
+begin
+	declare myvariable int default 100;
+	select myvariable;
+	set myvariable=myvariable+20;
+	select myvariable;
+end//
+
+delimiter ;
+
+#在存储过程中定义变量并且存储数值
+delimiter //
+create procedure Pro4()
+begin
+	declare dept_id int;
+	declare dept_name char(20);
+	select id,name into dept_id,dept_name from sept where id=1;
+	select dept_id,dept_name;
+end//
+
+delimiter ;
+
+delimiter //
+
+
+#在存储过程中定义判断条件IF
+delimiter //
+create procedure Pro6()
+begin
+	declare v varchar(5);
+	set v='a';
+	if v is null then select 'is null!';
+	else select 'not null!';
+	end if;
+end//
+
+delimiter ;
+
+#在存储过程中定义判断条件case
+
+delimiter //
+create procedure Pro7()
+begin
+	declare v int;
+	set v=1;
+	case v
+		when 1 then select '1';
+		when 2 then select '2';
+		else select 'not 1 and not 2';
+	end case;
+end//
+
+delimiter ;
+
+delimiter //
+create procedure Pro8()
+begin
+	declare v char(2);
+	set v='a';
+	case v
+		when 'a' then select 'a';
+		when 'b' then select 'b';
+		else select 'not a and not b';
+	end case;
+end//
+
+delimiter ;
+
+#在存储过程中定义判断循环，iterate继续循环 leave跳出循环
+delimiter //
+create procedure pro9()
+begin
+	declare id int default 0;
+	add_loop:loop
+		set id=id+1;
+		if id<10 then iterate add_loop;
+		elseif id>20 then leave add_loop;
+		end if;
+		select 'id is between 10 and 20';
+	end loop add_loop;
+end//
+
+
+delimiter //
+create procedure sum_repeat(a int)
+begin 
+	declare sum int default 0;
+	declare tem int default 0;
+	repeat
+		set tem=tem+1;
+		set sum=sum+tem;
+	until tem>a end repeat;
+	select sum;
+end//
+
+
+
+delimiter //
+create procedure sum_while(a int)
+begin 
+	declare sum int default 0;
+	declare tem int default 0;
+	while tem<=a do
+		set tem=tem+1;
+		set sum=sum+tem;
+	end while;
+	select sum;
+end//
+
+
+delimiter //
+create procedure sum_while3(in a int,out res char(20))
+begin 
+	declare sum int default 0;
+	declare tem int default 0;
+	while tem<=a do
+		set tem=tem+1;
+		set sum=sum+tem;
+	end while;
+	select sum;
+	set res='算完了';
+end//
+
+
+#创建视图
+create view view_stu as select math,chinese from exam;
+create view view_stu2(数学，语文) as select math,chinese from exam;
+select * from view_stu2;
+select * from view_stu;
+
+#查看视图
+describe view_stu2;
+show table status like 'view_stu2';
+show create view view_stu2;
+
+#更改视图
+create view view_stu2(数学，语文) as select math,chinese from exam;
+alter view view_stu2(数学，语文) as select math,chinese from exam;
+
+#更新视图
+update view_stu set chinese=100;
+insert into view_stu values('5','lili',20,30,60);
+
+#数据库的备份
+mysqldump -u root -p mydb3 > f:/mysqldump.sql
+
+#还原数据库
+create database mydb3;
+mysql -u root -p mydb3 < f:/mysqldump.sql
+
+create database mydb3;
+source f:/mysqldump.sql
+
+#创建用户
+grant select on mydb3.* to 'lili'@'localhost' identified by '123';
+create user 'xuebi'@'localhost' identified by '123';
+grant usage on *.* TO 'lili'@'localhost' identified by '123';
+
+#如果直接对mysql.user进行用户操作，需要flush privileges
+
+#修改root密码
+set password=PASSWORD('123');
+update mysql.user set password=PASSWORD('123') where user='root' and host='localhost';
+flush privileges；
+
+#修改用户密码(带root权限)
+set password for 'lili'@'localhost'=password('123');
+
+#赋予权限
+grant insert,select on *.* to 'lz'@'localhost' identified by '123' with grant option;
+
+
+#查看权限
+show grants for 'lili'@'localhost';
+
+#收回权限
+revoke select on *.* from 'lili'@'localhost';
+revoke all privileges  ,grant option from 'lili'@'localhost';
+
+
+
